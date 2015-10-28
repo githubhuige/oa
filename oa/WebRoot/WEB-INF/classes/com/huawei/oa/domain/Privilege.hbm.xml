@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="com.huawei.oa.domain">
+
+	<class name="Privilege" table="oa_privilege">
+		<id name="id">
+            <generator class="native"/>
+		</id>
+		<property name="name"/>
+		<property name="url"/>
+		<property name="icon"/>
+		
+		<!-- roles属性，本类与Role的多对多 -->
+		<set name="roles" table="oa_role_privilege" lazy="false">
+			<key column="privilegeId"></key>
+			<many-to-many class="Role" column="roleId"></many-to-many>
+		</set>
+		<!-- parent属性，本类与Privilege(上级)多对一 -->
+		<many-to-one name="parent" class="Privilege" column="privilegeId" lazy="false"></many-to-one>
+		<!-- children属性，本类与Privilege(下级)一对多 -->
+		<set name="children" lazy="false">
+			<key column="privilegeId"></key>
+			<one-to-many class="Privilege"/>
+		</set>
+	</class>
+	
+</hibernate-mapping>

@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="com.huawei.oa.domain">
+
+	<class name="User" table="oa_user">
+		<id name="id">
+            <generator class="native"/>
+		</id>
+		<property name="name"/>
+		<property name="loginName"/>
+		<property name="gender"/>
+		<property name="phoneNumber"/>
+		<property name="email"/>
+		<property name="description"/>
+		<property name="password"/>
+		
+		<!-- department属性，本类与Department的多对一 -->
+		<many-to-one name="department" class="Department" column="departmentId" lazy="false"></many-to-one>
+		<!-- roles属性，本类与Role多对多 -->
+		<set name="roles" table="oa_user_role" lazy="false">
+			<key column="userId"></key>
+			<many-to-many class="Role" column="roleId"></many-to-many>
+		</set>
+	</class>
+	
+</hibernate-mapping>

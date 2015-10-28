@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<struts>
+	<!-- 配置为开发模式 -->
+	<constant name="struts.devMode" value="true" />
+	<!-- 配置扩展名为action -->
+	<constant name="struts.action.extension" value="action" />
+	<!-- 代表是简单主题，说明table无效 -->
+	<constant name="struts.ui.theme" value="simple" />
+	<!-- 让OGNL中可以使用静态的方法 -->
+	<constant name="struts.ognl.allowStaticMethodAccess" value="true" />
+
+
+
+
+	<package name="default" namespace="/" extends="struts-default">
+
+		<interceptors>
+			<interceptor name="CheckPrivilegeInterceptor" class="com.huawei.oa.interceptor.CheckPrivilegeInterceptor"></interceptor>
+			<interceptor-stack name="myInterceptor">
+				<interceptor-ref name="CheckPrivilegeInterceptor"></interceptor-ref>
+				<interceptor-ref name="defaultStack"></interceptor-ref>
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="myInterceptor"></default-interceptor-ref>
+		<!-- 配置全局result -->
+		<global-results>
+			<result name="loginUI">/WEB-INF/jsp/userAction/loginUI.jsp</result>
+			<result name="noPrivilegeError">/noPrivilegeError.jsp</result>
+		</global-results>
+		<!-- 测试用的action，当与Spring整合后，class属性写的就是Spring中bean的名称 -->
+
+		<action name="test" class="testAction">
+			<result name="success">/test.jsp</result>
+		</action>
+
+
+		<!-- 岗位管理 -->
+		<action name="roleAction_*" class="roleAction" method="{1}">
+			<result name="list">/WEB-INF/jsp/roleAction/list.jsp</result>
+			<result name="toList" type="redirectAction">roleAction_list</result>
+			<result name="addUI">/WEB-INF/jsp/roleAction/addUI.jsp</result>
+			<result name="updateUI">/WEB-INF/jsp/roleAction/updateUI.jsp</result>
+			<result name="setPrivilegeUI">/WEB-INF/jsp/roleAction/setPrivilegeUI.jsp</result>
+		</action>
+		<!-- 部门管理 -->
+		<action name="departmentAction_*" class="departmentAction" method="{1}">
+			<result name="list">/WEB-INF/jsp/departmentAction/list.jsp</result>
+			<!-- parentId=${parentId}表示添加修改删除都回到上一级 -->
+			<result name="toList" type="redirectAction">departmentAction_list?parentId=${parentId}</result>
+			<result name="addUI">/WEB-INF/jsp/departmentAction/addUI.jsp</result>
+		</action>
+		<!-- 用户管理 -->
+		<action name="userAction_*" class="userAction" method="{1}">
+			<result name="list">/WEB-INF/jsp/userAction/list.jsp</result>
+			<result name="toList" type="redirectAction">userAction_list</result>
+			<result name="addUI">/WEB-INF/jsp/userAction/addUI.jsp</result>
+
+			<result name="loginOut">/WEB-INF/jsp/userAction/logout.jsp</result>
+			<result name="index" type="redirect">/index.jsp</result>
+		</action>
+		<!-- 首页 -->
+		<action name="homeAction_*" class="homeAction" method="{1}">
+			<result name="{1}">/WEB-INF/jsp/homeAction/{1}.jsp</result>
+		</action>
+		<!-- 论坛管理 -->
+		<action name="forumManageAction_*" class="forumManageAction" method="{1}">
+			<result name="list">/WEB-INF/jsp/forumManageAction/list.jsp</result>
+			<result name="toList" type="redirectAction">forumManageAction_list</result>
+			<result name="addUI">/WEB-INF/jsp/forumManageAction/addUI.jsp</result>
+		</action>
+		<!-- 板块管理 -->
+		<action name="forumAction_*" class="forumAction" method="{1}">
+			<result name="list">/WEB-INF/jsp/forumAction/list.jsp</result>
+			<result name="show">/WEB-INF/jsp/forumAction/show.jsp</result>
+		</action>
+		<!-- 主题管理 -->
+		<action name="topicAction_*" class="topicAction" method="{1}">
+			<result name="show">/WEB-INF/jsp/topicAction/show.jsp</result>
+			<result name="addUI">/WEB-INF/jsp/topicAction/addUI.jsp</result>
+			<result name="toShow" type="redirectAction">topicAction_show?id=${id}</result>
+		</action>
+		<!-- 回帖功能管理 -->
+		<action name="replyAction_*" class="replyAction" method="{1}">
+			<result name="toTopicShow" type="redirectAction">topicAction_show?id=${topicId}</result>
+			<result name="addUI">/WEB-INF/jsp/replyAction/addUI.jsp</result>
+		</action>
+		<!-- 审批流转：审批流程管理 -->
+		<action name="processDefinitionAction_*" class="processDefinitionAction" method="{1}">
+			<result name="list">/WEB-INF/jsp/processDefinitionAction/list.jsp</result>
+			<result name="addUI">/WEB-INF/jsp/processDefinitionAction/addUI.jsp</result>
+			<result name="toList" type="redirectAction">processDefinitionAction_list</result>
+			<!-- 下载专用的结果配置 -->
+			<result name="downloadProcessImage" type="stream">
+				<param name="contentType">image/png</param>
+				<param name="inputName">inputStream</param>
+			</result>
+		</action>
+		<!-- 审批流转：模板管理 -->
+		<action name="applicationTemplateAction_*" class="applicationTemplateAction" method="{1}">
+			<result name="list">/WEB-INF/jsp/applicationTemplateAction/list.jsp</result>
+			<result name="saveUI">/WEB-INF/jsp/applicationTemplateAction/saveUI.jsp</result>
+			<result name="toList" type="redirectAction">applicationTemplateAction_list</result>
+			<!-- 下载专用的结果配置 -->
+			<result name="download" type="stream">
+				<param name="contentType">application/octet-stream</param>
+				<param name="inputName">inputStream</param>
+				<param name="contentDisposition">attachment;filename="${#fileName}.doc"</param>
+			</result>
+		</action>
+		<!-- 审批流转：申请流转 -->
+		<action name=" FlowAction_*" class=" FlowAction" method="{1}">
+			<result name="applicationTemplateList">/WEB-INF/jsp/ FlowAction/applicationTemplateList.jsp</result>
+			<result name="myApplicationList">/WEB-INF/jsp/ FlowAction/myApplicationList.jsp</result>
+			<result name="submitUI">/WEB-INF/jsp/ FlowAction/submitUI.jsp</result>
+			<result name="toApplicationTemplateList" type="redirectAction"> FlowAction_applicationTemplateList</result>
+			
+			<result name="myTaskList">/WEB-INF/jsp/ FlowAction/myTaskList.jsp</result>
+			<result name="approveUI">/WEB-INF/jsp/ FlowAction/approveUI.jsp</result>
+			<result name="toMyTaskList" type="redirectAction"> FlowAction_myTaskList</result>
+			<result name="approveHistory">/WEB-INF/jsp/ FlowAction/approveHistory.jsp</result>
+		</action>
+	</package>
+
+</struts>
